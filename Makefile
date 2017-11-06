@@ -9,17 +9,21 @@ all: cmptest example1 example2
 test: cmptest
 	@./cmptest
 
-cmp.o:
-	$(CC) $(CFLAGS) --std=c89 -fprofile-arcs -ftest-coverage -g -O0 -I. -c cmp.c
+%.o: %.c
+	$(CC) $(CFLAGS) --std=c99 -g -O3 -I. -c -o $@ $<
+
+libcmp.a: cmp.o cmp_stdio.o
+	ar rc $@ $?
+	ranlib $@
 
 cmptest: cmp.o
 	$(CC) $(CFLAGS) -Wno-error=deprecated-declarations -Wno-deprecated-declarations --std=c99 -I. -fprofile-arcs -ftest-coverage -g -O0 -o cmptest cmp.o test/test.c test/buf.c test/utils.c -lcmocka
 
 example1:
-	$(CC) $(CFLAGS) --std=c89 -O3 -I. -o example1 cmp.c examples/example1.c
+	$(CC) $(CFLAGS) --std=c99 -O3 -I. -o example1 cmp.c examples/example1.c
 
 example2:
-	$(CC) $(CFLAGS) --std=c89 -O3 -I. -o example2 cmp.c examples/example2.c
+	$(CC) $(CFLAGS) --std=c99 -O3 -I. -o example2 cmp.c examples/example2.c
 
 coverage:
 	@rm -f base_coverage.info test_coverage.info total_coverage.info
